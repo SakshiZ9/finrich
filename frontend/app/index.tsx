@@ -31,6 +31,7 @@ export default function LoginScreen() {
       });
     } catch (error) {
       setIsRegister(true);
+      handleRegister();
     }
   };
 
