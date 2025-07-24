@@ -3,12 +3,26 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from models import db, User, Sale
 import joblib
-import openai
+from openai import AzureOpenAI
 import numpy as np
-import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crafts.db'
+
+endpoint = "https://sarka-mdhjo9x6-canadaeast.cognitiveservices.azure.com/"
+model_name = "gpt-4o-mini"
+deployment = "gpt-4o-mini-2"
+
+subscription_key = "API_KEY"
+api_version = "2024-12-01-preview"
+
+client = AzureOpenAI(
+    api_version=api_version,
+    azure_endpoint=endpoint,
+    api_key=subscription_key,
+)
+
+
 
 db.init_app(app)
 CORS(app)
@@ -104,54 +118,55 @@ def knowledge():
         {"title": "Festival Sales Tips", "content": "Increase inventory for festivals."}
     ])
 
-with open("responses.json", "r") as f:
-    saved_responses = json.load(f)
-
-def find_response(params):
-    """
-    Find a saved response matching the input params approximately.
-    This is a simple exact matching based on keys—you can make it smarter.
-    """
-    for item in saved_responses:
-        prompt_params = item.get("prompt_parameters", {})
-        # Simple matching: all keys in prompt_params have to match params exactly
-        if all(str(params.get(k)) == str(v) for k, v in prompt_params.items()):
-            return item.get("response_table")
-
-    return None
-
 # Budgeting: AI Recommendation
 @app.route('/generate-plan', methods=['POST'])
 def generate_plan():
     data = request.get_json() or {}
 
-    user_name = data.get('name')              # or get it from DB if needed
-    age = data.get('age')
-    occupation = data.get('occupation')
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
     initial_fund = data.get('initial_fund')
+    region = data.get('region')
     orders = data.get('orders')
     timeline = data.get('timeline')
 
-    required_fields = [user_name, age, occupation, initial_fund, orders, timeline]
-    if not all(required_fields):
-        return jsonify({"error": "Missing required input fields"}), 400
+    if not all([initial_fund, region, orders, timeline]):
+        return jsonify({"error": "Missing required fields: initial_fund, region, orders, timeline"}), 400
 
-    params_to_match = {
-        "name": user_name,
-        "age": age,
-        "occupation": occupation,
-        "initial_fund": initial_fund,
-        "orders": orders,
-        "timeline": timeline
-    }
+    prompt = f"""
+    My name is {user.name}, age {user.age}, occupation {user.occupation}, 
+    with an initial fund of ₹{initial_fund}, planning {orders} orders over {timeline} months.
+    Please generate a budget planner table including:
+    - raw material cost
+    - machine cost
+    - tool cost
+    - transport cost
+    - labour cost
+    - profit margin.
+    """
+    print(f"Generated prompt: {prompt}")
+    try:
+        response = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            max_completion_tokens=800,
+            temperature=1.0,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            model=deployment
+        )
 
-    # Try to find matching saved response
-    response_table = find_response(params_to_match)
+        budget_plan = response.choices[0].message.content
+    except Exception as e:
+        return jsonify({"error": f"OpenAI API error: {str(e)}"}), 500
 
-    if not response_table:
-        return jsonify({"error": "No saved response found for the given inputs."}), 404
-
-    return jsonify({"budget_plan_table": response_table})
+    return jsonify({'budget_plan': budget_plan})
 
 if __name__ == '__main__':
     with app.app_context():
