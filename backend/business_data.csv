@@ -1,6 +1,0 @@
-profit,expenses,num_sales,promotion_spent,season,action
-12000,9000,5,300,festival,increase_marketing
-9000,8000,4,200,regular,reduce_material_costs
-14000,10000,6,600,festival,increase_inventory
-1000,500,10,100,festival,Increase Promotion
-800,400,8,80,regular,Reduce Expenses

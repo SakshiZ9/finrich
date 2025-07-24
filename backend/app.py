@@ -27,10 +27,6 @@ client = AzureOpenAI(
 db.init_app(app)
 CORS(app)
 print("Starting backend...")
-model = joblib.load('recommendation_model.pkl')
-print("Loaded recommendation_model.pkl")
-action_mapping = joblib.load('action_mapping.pkl')
-print("Loaded action_mapping.pkl")
 season_map = {'festival': 0, 'off_season': 1, 'holiday': 2, 'regular': 3}
 
 # User Registration/KYC with email check

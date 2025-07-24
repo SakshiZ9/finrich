@@ -3,7 +3,7 @@ import { View, TextInput, Button, Text, Alert } from "react-native";
 import axios from "axios";
 import { useRouter } from "expo-router";
 
-const API_URL = "http://172.20.10.2:5000";
+const API_URL = "http://192.168.63.212:5000";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -64,6 +64,7 @@ export default function LoginScreen() {
         aadhaar,
         phone,
       });
+      console.log("User registered successfully");
       // After successful registration, attempt login
       handleLogin();
     } catch (error) {
