@@ -4,7 +4,7 @@ import { SafeAreaView, TextInput, Button, Text, ScrollView, StyleSheet, View } f
 import axios from "axios";
 import { useSearchParams } from "expo-router";
 
-const API_URL = "http://192.168.63.212:5000";
+const API_URL = "http://10.13.235.76:5000";
 
 export default function BudgetingScreen() {
   const [userId, setUserId] = useState('');

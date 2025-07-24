@@ -1,14 +1,21 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, Alert } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  Text,
+  Alert,
+  StyleSheet,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import axios from "axios";
 import { useRouter } from "expo-router";
 
-const API_URL = "http://192.168.63.212:5000";
+const API_URL = "http://10.13.235.76:5000";
 
 export default function LoginScreen() {
   const router = useRouter();
-
-  // Form states
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -17,7 +24,6 @@ export default function LoginScreen() {
   const [phone, setPhone] = useState("");
   const [isRegister, setIsRegister] = useState(false);
 
-  // Login handler
   const handleLogin = async () => {
     if (!email) {
       Alert.alert("Please enter your email.");
@@ -35,14 +41,11 @@ export default function LoginScreen() {
     }
   };
 
-  // Register handler
   const handleRegister = async () => {
     if (!email || !name || !age || !occupation || !aadhaar || !phone) {
       Alert.alert("Please fill all fields.");
       return;
     }
-
-    // Basic validation examples (optional)
     if (isNaN(Number(age)) || Number(age) <= 0) {
       Alert.alert("Please enter a valid age.");
       return;
@@ -65,8 +68,6 @@ export default function LoginScreen() {
         aadhaar,
         phone,
       });
-      console.log("User registered successfully");
-      // After successful registration, attempt login
       handleLogin();
     } catch (error) {
       Alert.alert("Registration failed", "Please try again later.");
@@ -74,66 +75,124 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-      <Text style={{ fontSize: 20, marginBottom: 15 }}>Login or Register</Text>
+    <ImageBackground
+      source={require("../assets/handicraft_bg.jpg")} // Add a rustic/texture image in your assets
+      style={styles.bg}
+      resizeMode="cover"
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>🎨 Handicraft Finance Portal</Text>
+        <Text style={styles.subtitle}>Login or Register to Continue</Text>
 
-      <Text>Email:</Text>
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          placeholder="Enter your email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      {isRegister && (
-        <>
-          <Text>Name:</Text>
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
+        {isRegister && (
+          <>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+              placeholder="Your full name"
+            />
+
+            <Text style={styles.label}>Age</Text>
+            <TextInput
+              value={age}
+              onChangeText={setAge}
+              style={styles.input}
+              placeholder="Your age"
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.label}>Occupation</Text>
+            <TextInput
+              value={occupation}
+              onChangeText={setOccupation}
+              style={styles.input}
+              placeholder="e.g. Potter, Weaver"
+            />
+
+            <Text style={styles.label}>Aadhaar Number</Text>
+            <TextInput
+              value={aadhaar}
+              onChangeText={setAadhaar}
+              style={styles.input}
+              placeholder="12-digit Aadhaar"
+              keyboardType="numeric"
+              maxLength={12}
+            />
+
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              style={styles.input}
+              placeholder="10-digit phone"
+              keyboardType="phone-pad"
+              maxLength={10}
+            />
+          </>
+        )}
+
+        <View style={styles.buttonContainer}>
+          <Button
+            title={isRegister ? "Register & Login" : "Login"}
+            color="#8B4513"
+            onPress={isRegister ? handleRegister : handleLogin}
           />
-
-          <Text>Age:</Text>
-          <TextInput
-            value={age}
-            onChangeText={setAge}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-            keyboardType="numeric"
-          />
-
-          <Text>Occupation:</Text>
-          <TextInput
-            value={occupation}
-            onChangeText={setOccupation}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-          />
-
-          <Text>Aadhaar Number:</Text>
-          <TextInput
-            value={aadhaar}
-            onChangeText={setAadhaar}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-            keyboardType="numeric"
-            maxLength={12}
-          />
-
-          <Text>Phone Number:</Text>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-            keyboardType="phone-pad"
-            maxLength={10}
-          />
-        </>
-      )}
-
-      <Button
-        title={isRegister ? "Register & Login" : "Login"}
-        onPress={isRegister ? handleRegister : handleLogin}
-      />
-    </View>
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 }
+
+const styles = StyleSheet.create({
+  bg: {
+    flex: 1,
+  },
+  container: {
+    flexGrow: 1,
+    backgroundColor: "rgba(255,248,240,0.85)", // slight tint over background
+    padding: 24,
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#4E342E",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#6D4C41",
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 14,
+    color: "#5D4037",
+    marginBottom: 6,
+    fontWeight: "600",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#D7CCC8",
+    backgroundColor: "#FFF",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+});
