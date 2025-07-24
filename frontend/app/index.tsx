@@ -8,12 +8,16 @@ const API_URL = "http://172.20.10.2:5000";
 export default function LoginScreen() {
   const router = useRouter();
 
+  // Form states
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [businessType, setBusinessType] = useState("");
-  const [profit, setProfit] = useState("");
+  const [age, setAge] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [aadhaar, setAadhaar] = useState("");
+  const [phone, setPhone] = useState("");
   const [isRegister, setIsRegister] = useState(false);
 
+  // Login handler
   const handleLogin = async () => {
     if (!email) {
       Alert.alert("Please enter your email.");
@@ -26,22 +30,39 @@ export default function LoginScreen() {
         params: { user: JSON.stringify(res.data) },
       });
     } catch (error) {
-      // Could improve by checking error response status
       setIsRegister(true);
     }
   };
 
+  // Register handler
   const handleRegister = async () => {
-    if (!email || !name || !businessType || !profit) {
+    if (!email || !name || !age || !occupation || !aadhaar || !phone) {
       Alert.alert("Please fill all fields.");
       return;
     }
+
+    // Basic validation examples (optional)
+    if (isNaN(Number(age)) || Number(age) <= 0) {
+      Alert.alert("Please enter a valid age.");
+      return;
+    }
+    if (!/^\d{12}$/.test(aadhaar)) {
+      Alert.alert("Aadhaar number must be 12 digits.");
+      return;
+    }
+    if (!/^\d{10}$/.test(phone)) {
+      Alert.alert("Phone number must be 10 digits.");
+      return;
+    }
+
     try {
       await axios.post(`${API_URL}/register`, {
         name,
         email,
-        business_type: businessType,
-        profit: parseFloat(profit),
+        age: Number(age),
+        occupation,
+        aadhaar,
+        phone,
       });
       // After successful registration, attempt login
       handleLogin();
@@ -53,6 +74,7 @@ export default function LoginScreen() {
   return (
     <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
       <Text style={{ fontSize: 20, marginBottom: 15 }}>Login or Register</Text>
+
       <Text>Email:</Text>
       <TextInput
         value={email}
@@ -61,6 +83,7 @@ export default function LoginScreen() {
         autoCapitalize="none"
         keyboardType="email-address"
       />
+
       {isRegister && (
         <>
           <Text>Name:</Text>
@@ -69,21 +92,42 @@ export default function LoginScreen() {
             onChangeText={setName}
             style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
           />
-          <Text>Business Type:</Text>
+
+          <Text>Age:</Text>
           <TextInput
-            value={businessType}
-            onChangeText={setBusinessType}
-            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
-          />
-          <Text>Current Profit:</Text>
-          <TextInput
-            value={profit}
-            onChangeText={setProfit}
+            value={age}
+            onChangeText={setAge}
             style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
             keyboardType="numeric"
           />
+
+          <Text>Occupation:</Text>
+          <TextInput
+            value={occupation}
+            onChangeText={setOccupation}
+            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
+          />
+
+          <Text>Aadhaar Number:</Text>
+          <TextInput
+            value={aadhaar}
+            onChangeText={setAadhaar}
+            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
+            keyboardType="numeric"
+            maxLength={12}
+          />
+
+          <Text>Phone Number:</Text>
+          <TextInput
+            value={phone}
+            onChangeText={setPhone}
+            style={{ borderWidth: 1, marginBottom: 12, padding: 8 }}
+            keyboardType="phone-pad"
+            maxLength={10}
+          />
         </>
       )}
+
       <Button
         title={isRegister ? "Register & Login" : "Login"}
         onPress={isRegister ? handleRegister : handleLogin}

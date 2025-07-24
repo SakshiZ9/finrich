@@ -1,94 +1,99 @@
-// app/budget.js
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import { SafeAreaView, TextInput, Button, Text, ScrollView, StyleSheet, View } from "react-native";
 import axios from "axios";
-import { useSearchParams } from "expo-router";
 
 const API_URL = "http://172.20.10.2:5000";
 
 export default function BudgetingScreen() {
-  // Correctly destructure user param string from route
-  const { user: userStr } = useSearchParams();
+  const [name, setName] = useState('Riya'); // Hardcoded for example
+  const [age, setAge] = useState('23');
+  const [occupation, setOccupation] = useState('Painter');
 
-  // Parse JSON string safely to an object or fallback to {}
-  const user = userStr ? JSON.parse(userStr) : {};
+  const [initialFund, setInitialFund] = useState('');
+  const [orders, setOrders] = useState('');
+  const [timeline, setTimeline] = useState('');
+  const [budgetPlan, setBudgetPlan] = useState(null);
+  const [error, setError] = useState('');
 
-  const [expenses, setExpenses] = useState("");
-  const [season, setSeason] = useState("regular");
-  const [suggestion, setSuggestion] = useState("");
-
-  const getSuggestion = async () => {
-    if (!user.id) {
-      Alert.alert("User data missing", "Please login first.");
-      return;
-    }
+  const generatePlan = async () => {
+    setError('');
+    setBudgetPlan(null);
 
     try {
-      const res = await axios.post(`${API_URL}/get_ml_suggestion`, {
-        user_id: user.id,
-        profit: user.profit,
-        expenses: parseFloat(expenses) || 0,
-        season,
+      const res = await axios.post(`${API_URL}/generate-plan`, {
+        name,
+        age,
+        occupation,
+        initial_fund: Number(initialFund),
+        orders: Number(orders),
+        timeline: Number(timeline),
       });
-
-      setSuggestion(res.data.suggestion);
+      setBudgetPlan(res.data.budget_plan_table);
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch suggestion");
+      setError(error.response?.data?.error || "Failed to generate budget plan. Please try again.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Expenses:</Text>
-      <TextInput
-        value={expenses}
-        onChangeText={setExpenses}
-        keyboardType="numeric"
-        style={styles.input}
-        placeholder="Enter your expenses"
-      />
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Text style={styles.header}>Budget Planner</Text>
 
-      <Text style={styles.label}>Season (festival, regular, off_season, holiday):</Text>
-      <TextInput
-        value={season}
-        onChangeText={setSeason}
-        style={styles.input}
-        placeholder="Enter season"
-      />
+        <TextInput style={styles.input} placeholder="Name" onChangeText={setName} value={name} />
+        <TextInput style={styles.input} placeholder="Age" keyboardType="numeric" onChangeText={setAge} value={age} />
+        <TextInput style={styles.input} placeholder="Occupation" onChangeText={setOccupation} value={occupation} />
 
-      <Button title="Get AI Suggestion" onPress={getSuggestion} />
-      {suggestion ? (
-        <Text style={styles.suggestion}>AI Suggestion: {suggestion}</Text>
-      ) : null}
-    </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Initial Fund"
+          keyboardType="numeric"
+          onChangeText={setInitialFund}
+          value={initialFund}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Number of Orders"
+          keyboardType="numeric"
+          onChangeText={setOrders}
+          value={orders}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Timeline (months)"
+          keyboardType="numeric"
+          onChangeText={setTimeline}
+          value={timeline}
+        />
+
+        <Button title="Generate Budget Plan" onPress={generatePlan} />
+
+        {error ? <Text style={{ color: "red", marginTop: 10 }}>{error}</Text> : null}
+
+        {budgetPlan && (
+          <View style={styles.result}>
+            <Text style={styles.resultTitle}>Budget Plan:</Text>
+            <View style={styles.table}>
+              {budgetPlan.map((item, index) => (
+                <View style={styles.tableRow} key={index}>
+                  <Text style={styles.tableCell}>{item.cost_type}</Text>
+                  <Text style={styles.tableCell}>{item.amount}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "#f5f7fa",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 6,
-    color: "#2e70bb",
-    fontWeight: "600",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    backgroundColor: "#fff",
-  },
-  suggestion: {
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#23527c",
-  },
+  container: { flex: 1, padding: 20 },
+  header: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
+  input: { height: 40, borderColor: "gray", borderWidth: 1, marginBottom: 10, padding: 8 },
+  result: { marginTop: 20 },
+  resultTitle: { fontWeight: "bold", marginBottom: 10, fontSize: 18 },
+  table: { borderWidth: 1, borderColor: "#ccc" },
+  tableRow: { flexDirection: "row", paddingVertical: 8, borderBottomWidth: 1, borderColor: "#ccc" },
+  tableCell: { flex: 1, textAlign: "center" },
 });

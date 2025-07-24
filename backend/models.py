@@ -6,9 +6,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
-    business_type = db.Column(db.String(120))
-    profit = db.Column(db.Float)
+    age = db.Column(db.Integer)
+    occupation = db.Column(db.String(120))
+    aadhaar = db.Column(db.String(12), unique=True)
+    phone = db.Column(db.String(10), unique=True)
     savings = db.Column(db.Float, default=0)
+
 
 class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
