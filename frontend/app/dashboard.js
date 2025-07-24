@@ -46,6 +46,16 @@ export default function DashboardScreen({ params }) {
           })
         }
       />
+      <View style={{ height: 12 }} />
+      <Button
+        title="Cashflow Tracker"
+        onPress={() =>
+          router.push({
+            pathname: "/cashflowTracker",
+            params: { user: JSON.stringify(user) },
+          })
+        }
+      />
     </View>
   );
 }
