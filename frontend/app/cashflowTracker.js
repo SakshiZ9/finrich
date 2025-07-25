@@ -1,22 +1,21 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-// import BalanceCard from './BalanceCard';
-// import SummaryCards from './SummaryCards';
-// import TransactionTabs from './TransactionTabs';
-// import CashFlowChart from './CashFlowChart';
-// import ForecastPanel from './ForecastPanel';
+import BalanceCard from '../components/cashflow/BalanceCard';
+import SummaryCards from '../components/cashflow/SummaryCards';
+import TransactionTabs from '../components/cashflow/TransactionTabs';
+import CashFlowChart from '../components/cashflow/CashFlowChart';
+import ForecastPanel from './../components/cashflow/ForecastPanel';
 
 const CashFlowDashboardScreen = () => {
     console.log("CashFlowDashboardScreen rendered");
   return (
-    <View />
-    // <ScrollView style={styles.container}>
-    //   <BalanceCard />
-    //   <SummaryCards />
-    //   <TransactionTabs />
-    //   <CashFlowChart />
-    //   <ForecastPanel />
-    // </ScrollView>
+    <ScrollView style={styles.container}>
+        <BalanceCard />
+        <SummaryCards />
+        <TransactionTabs />
+        <CashFlowChart />
+        <ForecastPanel />
+    </ScrollView>
   );
 };
 
