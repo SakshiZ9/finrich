@@ -17,6 +17,7 @@ const API_URL = "http://172.20.10.5:5000";
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [occupation, setOccupation] = useState("");
@@ -85,14 +86,23 @@ export default function LoginScreen() {
         <Text style={styles.subtitle}>Login or Register to Continue</Text>
 
         <Text style={styles.label}>Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  style={styles.input}
+                  placeholder="Enter your password"
+                  secureTextEntry
+                />
 
         {isRegister && (
           <>
