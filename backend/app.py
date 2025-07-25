@@ -108,7 +108,7 @@ def generate_savings():
 
     prompt = f"""
     Hi, I am a small-scale handicraft worker. I have a savings amount of ₹{savings_amount}.
-    Please suggest some good investment and savings schemes in bullet points.
+    Please suggest some good investment and savings schemes in Tabular format.
     """
 
     print(f"Generated prompt: {prompt}")
@@ -159,15 +159,19 @@ def generate_plan():
         return jsonify({"error": "Missing required fields: initial_fund, region, orders, timeline"}), 400
 
     prompt = f"""
-    My name is {user.name}, age {user.age}, occupation {user.occupation}, 
-    with an initial fund of ₹{initial_fund}, planning {orders} orders over {timeline} months.
-    Please generate a budget planner table including:
-    - raw material cost
-    - machine cost
-    - tool cost
-    - transport cost
-    - labour cost
-    - profit margin.
+        My name is {user.name}, age {user.age}, occupation {user.occupation}, 
+        with an initial fund of ₹{initial_fund}, planning {orders} orders over {timeline} months.
+        Please generate a budget planner table including:
+        - raw material cost
+        - machine cost
+        - tool cost
+        - transport cost
+        - labour cost
+        - profit margin.
+
+        Strictly provide only json string in output, do not include any other text.
+        do not print json word in the response and remove the starting and trailing backticks.
+        Provide output with a single json node having the properties - raw_material_cost,machine_cost,tool_cost,transport_cost,labour_cost,profit_margin
     """
     print(f"Generated prompt: {prompt}")
     try:
@@ -182,11 +186,12 @@ def generate_plan():
         )
 
         budget_plan = response.choices[0].message.content
+        print(budget_plan)
     except Exception as e:
         return jsonify({"error": f"OpenAI API error: {str(e)}"}), 500
-
-    return jsonify({'budget_plan': budget_plan})
-
+    #print(json.load(budget_plan))
+    # Ensure the response is valid JSON
+    return jsonify({"budget_plan": budget_plan})
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

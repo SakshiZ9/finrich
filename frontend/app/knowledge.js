@@ -24,14 +24,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   screenTitle: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#6B4226",
-    textAlign: "center",
-    marginBottom: 18,
-    textShadowColor: "#e9c79e",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
+  fontSize: 28,
+  fontWeight: "bold",
+  color: "#FFFFFF", // bright white for contrast
+  textAlign: "center",
+  marginBottom: 18,
+  textShadowColor: "#000000", // stronger shadow
+  textShadowOffset: { width: 1, height: 1 },
+  textShadowRadius: 4,
+  backgroundColor: "rgba(0, 0, 0, 0.4)", // semi-transparent dark background
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 8,
+  alignSelf: "center",
   },
   languageSwitcher: {
     flexDirection: "row",

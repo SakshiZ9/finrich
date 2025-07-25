@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { SafeAreaView, TextInput, Button, Text, ScrollView, StyleSheet, View } from 'react-native';
 import axios from "axios";
 
-const API_URL = "http://10.13.235.76:5000";
+const API_URL = "http://172.20.10.5:5000";
 
 export default function SavingsScreen() {
   const [savingsAmount, setSavingsAmount] = useState('');
