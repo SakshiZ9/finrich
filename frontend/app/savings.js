@@ -1,57 +1,55 @@
+// app/savings.js
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, Alert } from "react-native";
+import { SafeAreaView, TextInput, Button, Text, ScrollView, StyleSheet, View } from 'react-native';
 import axios from "axios";
-import { useSearchParams } from "expo-router";
 
 const API_URL = "http://10.13.235.76:5000";
 
 export default function SavingsScreen() {
-  const { user: userStr } = useSearchParams();
-  const user = userStr ? JSON.parse(userStr) : null;
+  const [savingsAmount, setSavingsAmount] = useState('');
+  const [response, setResponse] = useState('');
 
-  const [savings, setSavings] = useState(user?.savings?.toString() || "");
-  const [message, setMessage] = useState("");
-
-  const updateSavings = async () => {
-    if (!user) {
-      Alert.alert("User data missing", "Please login to update savings.");
-      return;
-    }
-    if (!savings) {
-      Alert.alert("Please enter your savings amount.");
-      return;
-    }
+  const generateSavingsAdvice = async () => {
     try {
-      await axios.post(`${API_URL}/update_savings`, {
-        user_id: user.id,
-        savings: parseFloat(savings),
+      const res = await axios.post(`${API_URL}/generate-savings`, {
+        savings_amount: savingsAmount,
       });
-      setMessage("Savings Updated!");
+      setResponse(res.data.savings_plan || "No suggestions generated");
     } catch (error) {
-      Alert.alert("Error", "Failed to update savings. Please try again.");
+      console.error("Error generating savings suggestions:", error);
+      setResponse("Failed to generate savings suggestions. Please try again.");
     }
   };
 
-  if (!user) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-        <Text>User data missing. Please login again.</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text>Total Profit: ₹{user.profit}</Text>
-      <TextInput
-        placeholder="Current Savings"
-        value={savings}
-        onChangeText={setSavings}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, marginVertical: 10, padding: 8 }}
-      />
-      <Button title="Update Savings" onPress={updateSavings} />
-      {message ? <Text style={{ marginTop: 12, color: "green" }}>{message}</Text> : null}
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Text style={styles.header}> Your Savings & Investment Suggestions</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Savings Amount"
+          keyboardType="numeric"
+          onChangeText={setSavingsAmount}
+        />
+
+        <Button title="Get Suggestions" onPress={generateSavingsAdvice} />
+
+        {response ? (
+          <View style={styles.result}>
+            <Text style={styles.resultTitle}>Suggestions:</Text>
+            <Text>{response}</Text>
+          </View>
+        ) : null}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20 },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 8 },
+  result: { marginTop: 20 },
+  resultTitle: { fontWeight: 'bold', marginBottom: 5 },
+});
