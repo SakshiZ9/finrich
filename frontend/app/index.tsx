@@ -82,7 +82,7 @@ export default function LoginScreen() {
       resizeMode="cover"
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>🎨 Handicraft Finance Portal</Text>
+        <Text style={styles.title}>FinReach</Text>
         <Text style={styles.subtitle}>Login or Register to Continue</Text>
 
         <Text style={styles.label}>Email</Text>
@@ -206,3 +206,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+

@@ -30,7 +30,7 @@ export default function DashboardScreen({ params }) {
       {/* Add dark overlay */}
       <View style={styles.overlay}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>🎨 Welcome, {user.name || "Guest"}!</Text>
+          <Text style={styles.title}>🎨 Welcome, Harsh!</Text>
           <Text style={styles.subtitle}>Your artisan dashboard awaits...</Text>
 
           {[

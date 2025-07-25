@@ -108,7 +108,8 @@ def generate_savings():
 
     prompt = f"""
     Hi, I am a small-scale handicraft worker. I have a savings amount of ₹{savings_amount}.
-    Please suggest some good investment and savings schemes in Tabular format.
+    Please suggest some good investment and savings schemes in bullet points and only show the bullet pointed 
+    results in very formated way make headers in bold font.
     """
 
     print(f"Generated prompt: {prompt}")

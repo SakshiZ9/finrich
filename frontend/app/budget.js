@@ -67,28 +67,28 @@ export default function BudgetingScreen() {
     >
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Text style={styles.header}>💰 Budget Planner</Text>
-
-          <TextInput style={styles.input} placeholder="User ID" keyboardType="numeric" onChangeText={setUserId} value={userId} />
-          <TextInput style={styles.input} placeholder="Initial Fund" keyboardType="numeric" onChangeText={setInitialFund} value={initialFund} />
-          <TextInput style={styles.input} placeholder="Region" onChangeText={setRegion} value={region} />
-          <TextInput style={styles.input} placeholder="Number of Orders" keyboardType="numeric" onChangeText={setOrders} value={orders} />
-          <TextInput style={styles.input} placeholder="Timeline (months)" keyboardType="numeric" onChangeText={setTimeline} value={timeline} />
-
-          <TouchableOpacity style={styles.button} onPress={generatePlan} disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? "Generating..." : "Generate Budget Plan"}</Text>
-          </TouchableOpacity>
-
-          {loading && (
-            <ActivityIndicator size="large" color="#A47148" style={{ marginTop: 20 }} />
-          )}
-
-          {response ? (
-            <Animatable.View animation="fadeInUp" duration={600} style={styles.resultCard}>
-              <Text style={styles.resultTitle}>📊 Budget Plan:</Text>
-              <Text style={styles.resultText}>{response}</Text>
-            </Animatable.View>
-          ) : null}
+          <View style={styles.card}>
+            <Text style={styles.header}>💰 Budget Planner</Text>
+            <View style={styles.formGroup}>
+              <TextInput style={styles.input} placeholder="User ID" keyboardType="numeric" onChangeText={setUserId} value={userId} />
+              <TextInput style={styles.input} placeholder="Initial Fund" keyboardType="numeric" onChangeText={setInitialFund} value={initialFund} />
+              <TextInput style={styles.input} placeholder="Region" onChangeText={setRegion} value={region} />
+              <TextInput style={styles.input} placeholder="Number of Orders" keyboardType="numeric" onChangeText={setOrders} value={orders} />
+              <TextInput style={styles.input} placeholder="Timeline (months)" keyboardType="numeric" onChangeText={setTimeline} value={timeline} />
+            </View>
+            <TouchableOpacity style={styles.button} onPress={generatePlan} disabled={loading}>
+              <Text style={styles.buttonText}>{loading ? "Generating..." : "Generate Budget Plan"}</Text>
+            </TouchableOpacity>
+            {loading && (
+              <ActivityIndicator size="large" color="#A47148" style={{ marginTop: 20 }} />
+            )}
+            {response ? (
+              <Animatable.View animation="fadeInUp" duration={600} style={styles.resultCard}>
+                <Text style={styles.resultTitle}>📊 Budget Plan:</Text>
+                <Text style={styles.resultText}>{response}</Text>
+              </Animatable.View>
+            ) : null}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </ImageBackground>
@@ -104,48 +104,78 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgba(255, 250, 240, 0.92)',
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingHorizontal: 0,
+    justifyContent: 'center',
   },
   scrollContent: {
-    paddingBottom: 40,
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  card: {
+    backgroundColor: 'rgba(255, 248, 225, 0.97)',
+    borderRadius: 22,
+    paddingVertical: 32,
+    paddingHorizontal: 22,
+    shadowColor: "#A47148",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 20,
+    elevation: 8,
+    width: '98%',
+    maxWidth: 400,
+    marginTop: -30, // negative spacing to lift card closer to header
+    marginBottom: 12,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#6B4226',
-    marginBottom: 24,
+    marginBottom: 14,
     textAlign: 'center',
     textShadowColor: "#e9c79e",
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 2,
+    letterSpacing: 0.2,
+  },
+  formGroup: {
+    marginBottom: 0, // tight grouping
+    gap: -8, // negative spacing between inputs (if supported by your react-native version)
   },
   input: {
-    height: 50,
+    height: 48,
     backgroundColor: '#fff',
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 14,
+    marginBottom: -2, // negative spacing between fields
     borderWidth: 1,
     borderColor: '#d2b48c',
     fontSize: 16,
+    shadowColor: "#A47148",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 1,
+    elevation: 1,
   },
   button: {
     backgroundColor: '#A47148',
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: "#000",
+    marginTop: 22,
+    marginBottom: 18,
+    shadowColor: "#A47148",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.13,
+    shadowRadius: 6,
     elevation: 3,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
+    letterSpacing: 0.4,
   },
   resultCard: {
     backgroundColor: '#ffffff',
@@ -156,6 +186,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
+    marginTop: 10,
   },
   resultTitle: {
     fontSize: 18,
