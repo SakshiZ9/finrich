@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from models import db, User, Sale
-import joblib
+from models import db, User, Transactions
 from openai import AzureOpenAI
 import numpy as np
+from datetime import datetime, timedelta
+import calendar
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crafts.db'
 
 endpoint = "https://sarka-mdhjo9x6-canadaeast.cognitiveservices.azure.com/"
@@ -72,19 +74,19 @@ def login():
 
 
 # Add Sale + Monitoring
-@app.route('/add_sale', methods=['POST'])
-def add_sale():
-    data = request.json
-    sale = Sale(
-        user_id=data['user_id'],
-        amount=data['amount'],
-        promotion_spent=data.get('promotion_spent', 0),
-        season=data.get('season', 'regular'),
-        feedback=data.get('feedback', '')
-    )
-    db.session.add(sale)
-    db.session.commit()
-    return jsonify({"message": "Sale added."})
+# @app.route('/add_sale', methods=['POST'])
+# def add_sale():
+#     data = request.json
+#     sale = Sale(
+#         user_id=data['user_id'],
+#         amount=data['amount'],
+#         promotion_spent=data.get('promotion_spent', 0),
+#         season=data.get('season', 'regular'),
+#         feedback=data.get('feedback', '')
+#     )
+#     db.session.add(sale)
+#     db.session.commit()
+#     return jsonify({"message": "Sale added."})
 
 # Get Sales by user for monitoring
 @app.route('/get_sales/<int:user_id>')
@@ -189,9 +191,143 @@ def generate_plan():
         print(budget_plan)
     except Exception as e:
         return jsonify({"error": f"OpenAI API error: {str(e)}"}), 500
-    #print(json.load(budget_plan))
-    # Ensure the response is valid JSON
-    return jsonify({"budget_plan": budget_plan})
+
+    return jsonify({'budget_plan': budget_plan})
+
+# Cash Flow Management
+@app.route('/cashflow/balance', methods=['GET'])
+def get_balance():
+    today = datetime.utcnow()
+    start_of_this_month = today.replace(day=1)
+    start_of_last_month = (start_of_this_month - timedelta(days=1)).replace(day=1)
+    end_of_last_month = start_of_this_month - timedelta(days=1)
+
+    # Get all transactions
+    transactions = Transactions.query.all()
+
+    # This month
+    this_month_inflows = sum(t.amount for t in transactions if t.type == 'income' and t.date >= start_of_this_month)
+    this_month_outflows = sum(t.amount for t in transactions if t.type == 'expense' and t.date >= start_of_this_month)
+    this_month_balance = this_month_inflows - this_month_outflows
+
+    # Last month
+    last_month_inflows = sum(t.amount for t in transactions if t.type == 'income' and start_of_last_month <= t.date <= end_of_last_month)
+    last_month_outflows = sum(t.amount for t in transactions if t.type == 'expense' and start_of_last_month <= t.date <= end_of_last_month)
+    last_month_balance = last_month_inflows - last_month_outflows
+
+    # Calculate trend
+    if last_month_balance == 0:
+        trend = 0.0
+    else:
+        trend = ((this_month_balance - last_month_balance) / abs(last_month_balance)) * 100
+
+    return jsonify({
+        "balance": round(this_month_balance,2),
+        "trend": round(trend, 2)
+    })
+
+@app.route('/cashflow/cashflow_summary', methods=['GET'])
+def get_cashflow_summary():
+    
+    user_id = 1
+    transactions = Transactions.query.filter_by(user_id=user_id).all()
+
+    inflows = sum(t.amount for t in transactions if t.type.lower() == 'income')
+    outflows = sum(t.amount for t in transactions if t.type.lower() == 'expense')
+    net_cash = inflows - outflows
+
+    def format_currency(amount):
+        return f"₹ {amount:,.0f}"
+
+    response = [
+        {"label": "Inflows", "value": format_currency(inflows), "color": "#4caf50"},
+        {"label": "Outflows", "value": format_currency(outflows), "color": "#f44336"},
+        {"label": "Net Cash", "value": format_currency(net_cash), "color": "#2196f3"},
+    ]
+
+    return jsonify(response)
+
+@app.route('/cashflow/transactions', methods=['GET'])
+def get_cashflow_transactions():
+
+    user_id = 1
+    income = Transactions.query.filter_by(user_id=user_id, type='income').all()
+    expense = Transactions.query.filter_by(user_id=user_id, type='expense').all()
+
+    def format_transaction(tx):
+        return {
+            "id": str(tx.id),
+            "category": tx.category,
+            "amount": f"₹ {tx.amount:,}",
+            "date": tx.date.strftime('%b %d')
+        }
+
+    transactions = {
+        "income": [format_transaction(tx) for tx in income],
+        "expense": [format_transaction(tx) for tx in expense]
+    }
+
+    return jsonify(transactions)
+
+
+
+def get_chart_data(user_id):
+    today = datetime.today().date()
+    start_date = today - timedelta(days=150)
+    transactions = Transactions.query.filter(Transactions.user_id == user_id, Transactions.date >= start_date).all()
+
+    # Daily (last 6 days)
+    daily_labels = []
+    daily_data = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        total = sum(t.amount for t in transactions if t.date == day)
+        daily_labels.append(day.strftime('%b %d'))
+        daily_data.append(total)
+
+    # Weekly (last 4 weeks)
+    weekly_labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4','Week 5']
+    weekly_data = []
+    for i in range(4):
+        week_start = today - timedelta(days=(7 * (3 - i)))
+        week_end = week_start + timedelta(days=6)
+        total = sum(t.amount for t in transactions if week_start <= t.date.date() <= week_end)
+        weekly_data.append(total)
+
+    # Monthly (last 5 months)
+    monthly_labels = []
+    monthly_data = []
+    for i in range(5, -1, -1):
+        month = (today.replace(day=1) - timedelta(days=30*i))
+        month_start = month.replace(day=1)
+        last_day = calendar.monthrange(month_start.year, month_start.month)[1]
+        month_end = month.replace(day=last_day)
+        total = sum(t.amount for t in transactions if month_start <= t.date.date() <= month_end)
+        monthly_labels.append(month_start.strftime('%b'))
+        monthly_data.append(total)
+
+    return {
+        "daily": {
+            "labels": daily_labels,
+            "data": daily_data
+        },
+        "weekly": {
+            "labels": weekly_labels,
+            "data": weekly_data
+        },
+        "monthly": {
+            "labels": monthly_labels,
+            "data": monthly_data
+        }
+    }
+
+@app.route('/cashflow/chart_data', methods=['GET'])
+def chart_data():
+    user_id = 1
+    data = get_chart_data(user_id)
+    return jsonify(data)
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
