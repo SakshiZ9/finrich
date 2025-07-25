@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -20,3 +21,23 @@ class Sale(db.Model):
     promotion_spent = db.Column(db.Float)
     season = db.Column(db.String(32))
     feedback = db.Column(db.String(255))
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)  # if multi-user
+    type = db.Column(db.String(10), nullable=False)  # 'income' or 'expense'
+    category = db.Column(db.String(50), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "category": self.category,
+            "amount": self.amount,
+            "date": self.date.strftime('%Y-%m-%d')
+        }
+
+# app.py
+
