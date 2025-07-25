@@ -34,7 +34,7 @@ export default function DashboardScreen({ params }) {
           <Text style={styles.subtitle}>Your artisan dashboard awaits...</Text>
 
           {[
-            { title: "🧾 CashFlow Monitoring", path: "/sales" },
+            { title: "🧾 CashFlow Monitoring", path: "/cashflowTracker" },
             { title: "📊 Budgeting", path: "/budget" },
             { title: "📚 Knowledge Hub", path: "/knowledge" },
             { title: "💰 Savings", path: "/savings" },
