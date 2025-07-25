@@ -57,7 +57,7 @@ const ForecastPanel = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#e9d8c9ff',
     borderRadius: 12,
     padding: 12,
     elevation: 2,

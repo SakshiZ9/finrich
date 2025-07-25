@@ -24,22 +24,6 @@ const CashFlowChart = () => {
   if (!chartData) return <p>Loading...</p>;
   const selectedData = chartData[view];
 
-
-  // const chartData = {
-  //   daily: {
-  //     labels: ['Jul 20', 'Jul 21', 'Jul 22', 'Jul 23', 'Jul 24', 'Jul 25'],
-  //     data: [5000, 7000, 6000, 8000, 7500, 9000],
-  //   },
-  //   weekly: {
-  //     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-  //     data: [20000, 25000, 18000, 30000],
-  //   },
-  //   monthly: {
-  //     labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul'],
-  //     data: [22000, 27000, 25000, 30000, 35000],
-  //   },
-  // };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cash Flow Over Time</Text>
@@ -66,9 +50,9 @@ const CashFlowChart = () => {
         width={screenWidth - 32}
         height={220}
         chartConfig={{
-          backgroundColor: '#ffffff',
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
+          backgroundColor: '#e9d8c9ff',
+          backgroundGradientFrom: '#e9d8c9ff',
+          backgroundGradientTo: '#e9d8c9ff',
           decimalPlaces: 0,
           color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
@@ -88,7 +72,7 @@ const CashFlowChart = () => {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#e9d8c9ff',
     borderRadius: 12,
     padding: 12,
     elevation: 2,

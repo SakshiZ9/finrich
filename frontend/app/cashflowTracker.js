@@ -6,11 +6,12 @@ import TransactionTabs from '../components/cashflow/TransactionTabs';
 import CashFlowChart from '../components/cashflow/CashFlowChart';
 import ForecastPanel from './../components/cashflow/ForecastPanel';
 
+// Pass websiteColors as a prop to all components
 const CashFlowDashboardScreen = () => {
     console.log("CashFlowDashboardScreen rendered");
   return (
     <ScrollView style={styles.container}>
-        <BalanceCard />
+        <BalanceCard/>
         <SummaryCards />
         <TransactionTabs />
         <CashFlowChart />
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
   },
 });
 
