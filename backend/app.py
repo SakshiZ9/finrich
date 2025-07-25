@@ -88,16 +88,6 @@ def login():
 #     db.session.commit()
 #     return jsonify({"message": "Sale added."})
 
-# Get Sales by user for monitoring
-@app.route('/get_sales/<int:user_id>')
-def get_sales(user_id):
-    sales = Sale.query.filter_by(user_id=user_id).all()
-    return jsonify([
-        {"amount": s.amount, "Promotion": s.promotion_spent,
-         "season": s.season, "feedback": s.feedback}
-        for s in sales
-    ])
-
 
 # Savings: AI Recommendation
 @app.route('/generate-savings', methods=['POST'])

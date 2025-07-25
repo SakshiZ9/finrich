@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import random
 
 # Path to your local SQLite database
-db_path = '/Users/prernajagesia/Documents/Projects/handicraft-application/backend/instance/crafts.db'
+db_path = 'C:/BigData_POC/handicraft-application/test/backend/instance/crafts.db'
 
 # Connect to the SQLite database
 conn = sqlite3.connect(db_path)

@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 import * as Animatable from "react-native-animatable";
 
-const API_URL = "http://172.20.10.2:5000";
+const API_URL = "http://10.13.235.76:5000";
 
 // New vertical table component
 function VerticalTable({ plan }) {
